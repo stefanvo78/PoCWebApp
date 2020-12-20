@@ -34,51 +34,71 @@
 
 <div class="text-center">
     <form asp-page-handler="edit" method="post">
-        <input name="Message" id="txtMessage" type="text" /><input id="btnSearch" type="submit" value="Search" asp-page-handler="Search" />
-        <select name="Standort">
-            <option value="1005" selected>1005</option>
-            <option value="1006">1006</option>
-            <option value="1007">1007</option>
-            <option value="1008">1008</option>
-            <option value="1009">1009</option>
-            <option value="1080">1080</option>
-            <option value="1110">1110</option>
-            <option value="1180">1180</option>
-            <option value="1181">1181</option>
-        </select>
-        <input name="Date" id="txtDate" type="text" />
-    </form>
-
-    <br />
-    <table class="table">
-        <thead>
+        <table>
             <tr>
-                <th>
-                    Standortwerk
-                </th>
-                <th>
-                    KKS
-                </th>
-                <th>
-                    KKS Bezeichnung
-                </th>
+                <td style="width:200px">Fehlermeldung:</td>
+                <td style="width:200px"><input name="Message" id="txtMessage" type="text" /></td>
+                <td style="width:200px">Standort:</td>
+                <td style="width:100px">
+                    <select name="Standort">
+                        <option value="1005" selected>1005</option>
+                        <option value="1006">1006</option>
+                        <option value="1007">1007</option>
+                        <option value="1008">1008</option>
+                        <option value="1009">1009</option>
+                        <option value="1080">1080</option>
+                        <option value="1110">1110</option>
+                        <option value="1180">1180</option>
+                        <option value="1181">1181</option>
+                    </select>
+                </td>
             </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model.SAPData)
-            {
+           
+            <tr>
+                <td style="width:200px">Datum:</td>
+                <td style="width:200px"><input name="Date" id="txtDate" type="text" /></td>
+           
+                <td style="width:100px"></td>
+                <td style="width:200px"><input id="btnSearch" type="submit" value="Search" asp-page-handler="Search" /></td>
+            </tr>
+        </table>
+        <br />
+        <table class="table">
+            <thead>
                 <tr>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Standortwerk)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.KKS)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.KKSBezeichnung)
-                    </td>
+                    <th>
+                        Standortwerk
+                    </th>
+                    <th>
+                        KKS
+                    </th>
+                    <th>
+                        KKS Bezeichnung
+                    </th>
+                    <th>
+                        Propability
+                    </th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.SAPDataList)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Standortwerk)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.KKS)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.KKSBezeichnung)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Propability)
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </form>
 </div>
