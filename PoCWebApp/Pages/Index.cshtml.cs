@@ -70,8 +70,8 @@ namespace PoCWebApp.Pages
                 temp = (List<SAPData>) db.SapData
                         .Where(sd => sd.Standortwerk == this.Standort &&
                                 ( (Date == DateTime.MinValue) ||
-                               ((sd.SAPStoerungsbeginn != null && sd.SAPStoerungsbeginn >= Date.AddHours(-8)) ||
-                                   (sd.SAPStoerungsbeginn == null && sd.ProperEreignisbeginn != null && sd.ProperEreignisbeginn >= Date.AddHours(-8)))
+                               ((sd.SAPStoerungsbeginn != null && (sd.SAPStoerungsbeginn >= Date.AddHours(-8) && sd.SAPStoerungsbeginn <= Date.AddHours(8)  )) ||
+                                   (sd.SAPStoerungsbeginn == null && sd.ProperEreignisbeginn != null && (sd.ProperEreignisbeginn >= Date.AddHours(-8) && sd.ProperEreignisbeginn <= Date.AddHours(8))))
                                    ))
                         .ToList();
             }

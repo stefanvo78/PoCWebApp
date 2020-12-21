@@ -67,6 +67,9 @@
             <thead>
                 <tr>
                     <th>
+                        Auswählen
+                    </th>
+                    <th>
                         Standortwerk
                     </th>
                     <th>
@@ -78,25 +81,34 @@
                     <th>
                         Propability
                     </th>
+                    <th>
+                        Ereignisbeschreibung
+                    </th>
                 </tr>
             </thead>
             <tbody>
                 @foreach (var item in Model.SAPDataList)
                 {
-                    <tr>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.Standortwerk)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.KKS)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.KKSBezeichnung)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.Propability)
-                        </td>
-                    </tr>
+                <tr>
+                    <td>
+                        <input id="Choose" type="checkbox" />
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Standortwerk)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.KKS)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.KKSBezeichnung)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Propability)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Ereignisbeschreibung)
+                    </td>
+                </tr>
                 }
             </tbody>
         </table>
