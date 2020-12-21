@@ -33,35 +33,39 @@
 </style>
 
 <div class="text-center">
-    <form asp-page-handler="edit" method="post">
+    <form method="post">
         <table>
             <tr>
                 <td style="width:200px">Fehlermeldung:</td>
-                <td style="width:200px"><input name="Message" id="txtMessage" type="text" /></td>
+                <td style="width:200px"><input name="Message" id="txtMessage" type="text" value="@ViewData["message"]?.ToString()" /></td>
                 <td style="width:200px">Standort:</td>
                 <td style="width:100px">
-                    <select name="Standort">
-                        <option value="1005" selected>1005</option>
-                        <option value="1006">1006</option>
-                        <option value="1007">1007</option>
-                        <option value="1008">1008</option>
-                        <option value="1009">1009</option>
-                        <option value="1080">1080</option>
-                        <option value="1110">1110</option>
-                        <option value="1180">1180</option>
-                        <option value="1181">1181</option>
+                    <select id="StandortId" name="Standort">
+                        @foreach (string standort in Model.Standorte)
+                        {
+                            if ( ViewData["standort"] != null && ViewData["standort"].ToString() == standort)
+                            {
+                                <option value="@standort" selected>@standort</option>
+                            }
+                            else
+                            {
+                                <option value="@standort">@standort</option>
+                            }
+                        }
                     </select>
                 </td>
             </tr>
-           
+
             <tr>
                 <td style="width:200px">Datum:</td>
-                <td style="width:200px"><input name="Date" id="txtDate" type="text" /></td>
-           
+                <td style="width:200px"><input name="Date" id="txtDate" type="text" value="@ViewData["date"]?.ToString()" /></td>
+
                 <td style="width:100px"></td>
                 <td style="width:200px"><input id="btnSearch" type="submit" value="Search" asp-page-handler="Search" /></td>
             </tr>
         </table>
+
+
         <br />
         <table class="table">
             <thead>
@@ -89,26 +93,26 @@
             <tbody>
                 @foreach (var item in Model.SAPDataList)
                 {
-                <tr>
-                    <td>
-                        <input id="Choose" type="checkbox" />
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Standortwerk)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.KKS)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.KKSBezeichnung)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Propability)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Ereignisbeschreibung)
-                    </td>
-                </tr>
+                    <tr>
+                        <td>
+                            <input id="Choose" type="checkbox" />
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Standortwerk)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.KKS)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.KKSBezeichnung)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Propability)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Ereignisbeschreibung)
+                        </td>
+                    </tr>
                 }
             </tbody>
         </table>

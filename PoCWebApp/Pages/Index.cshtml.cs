@@ -36,10 +36,23 @@ namespace PoCWebApp.Pages
 
         private readonly ILogger<IndexModel> _logger;
 
+        public List<string> Standorte; 
+
         public IndexModel(ILogger<IndexModel> logger)
         {
             _logger = logger;
             SAPDataList = new List<SAPData>();
+
+            Standorte = new List<string>();
+            Standorte.Add("1005");
+            Standorte.Add("1006");
+            Standorte.Add("1007");
+            Standorte.Add("1008");
+            Standorte.Add("1009");
+            Standorte.Add("1080");
+            Standorte.Add("1110");
+            Standorte.Add("1180");
+            Standorte.Add("1181");
         }
 
         public void OnGet()
@@ -53,6 +66,11 @@ namespace PoCWebApp.Pages
         }
         public async void OnPostSearch()
         {
+            ViewData["message"] = this.Message;
+            ViewData["date"] = this.Date == DateTime.MinValue ? "" : this.Date.ToString();
+            ViewData["standort"] = this.Standort;
+            
+
             List<SAPData> temp = new List<SAPData>();
 
             string body = "{\"data\": [\"" + this.Message + "\"]}";
