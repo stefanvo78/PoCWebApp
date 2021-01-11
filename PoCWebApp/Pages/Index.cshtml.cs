@@ -35,14 +35,17 @@ namespace PoCWebApp.Pages
 
         public List<SAPData> SAPDataList { get; set; }
 
+        private IConfigurationRoot ConfigRoot;
+
         private readonly SAPContext _SAPContext;
 
         private readonly ILogger<IndexModel> _logger;
 
         public List<string> Standorte; 
 
-        public IndexModel(ILogger<IndexModel> logger, SAPContext sapcontext)
+        public IndexModel(ILogger<IndexModel> logger, SAPContext sapcontext, IConfiguration configRoot)
         {
+            ConfigRoot = (IConfigurationRoot)configRoot;
             _SAPContext = sapcontext;
             _logger = logger;
             SAPDataList = new List<SAPData>();
@@ -83,8 +86,9 @@ namespace PoCWebApp.Pages
                 string body = "{\"data\": [\"" + this.Message + "\"]}";
                 var content = new StringContent(body);
                 content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-
-                var response = client.PostAsync("http://36efb52d-3352-412c-b2d5-a194108c8684.westeurope.azurecontainer.io/score", content).Result;
+                var mlModelURL = ConfigRoot["MLModelURL"];
+                
+                var response = client.PostAsync(mlModelURL, content).Result;
 
                 var responseString = response.Content.ReadAsStringAsync().Result;
                 string result = JsonConvert.DeserializeObject<string>(responseString);
