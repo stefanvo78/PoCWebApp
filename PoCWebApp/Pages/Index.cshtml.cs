@@ -14,6 +14,7 @@ using System.Net.Http.Headers;
 using Newtonsoft.Json;
 using Microsoft.EntityFrameworkCore.ValueGeneration.Internal;
 using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.Extensions.Configuration;
 
 namespace PoCWebApp.Pages
 {
@@ -32,14 +33,17 @@ namespace PoCWebApp.Pages
         [BindProperty]
         public DateTime Date { get; set; }
 
-        public List<SAPData> SAPDataList { get; set; } 
+        public List<SAPData> SAPDataList { get; set; }
+
+        private readonly SAPContext _SAPContext;
 
         private readonly ILogger<IndexModel> _logger;
 
         public List<string> Standorte; 
 
-        public IndexModel(ILogger<IndexModel> logger)
+        public IndexModel(ILogger<IndexModel> logger, SAPContext sapcontext)
         {
+            _SAPContext = sapcontext;
             _logger = logger;
             SAPDataList = new List<SAPData>();
 
@@ -69,58 +73,65 @@ namespace PoCWebApp.Pages
             ViewData["message"] = this.Message;
             ViewData["date"] = this.Date == DateTime.MinValue ? "" : this.Date.ToString();
             ViewData["standort"] = this.Standort;
-            
+             
+            List <SAPData> temp = new List<SAPData>();
 
-            List<SAPData> temp = new List<SAPData>();
-
-            string body = "{\"data\": [\"" + this.Message + "\"]}";
-            var content = new StringContent(body);
-            content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-
-            var response = client.PostAsync("http://36efb52d-3352-412c-b2d5-a194108c8684.westeurope.azurecontainer.io/score", content).Result;
-
-            var responseString = response.Content.ReadAsStringAsync().Result;
-            string result = JsonConvert.DeserializeObject<string>(responseString);
-            Dictionary<string, double> mapResult = JsonConvert.DeserializeObject<Dictionary<string, double>>(result);
-
-            using (var db = new SAPContext())
+            try
             {
-                temp = (List<SAPData>) db.SapData
-                        .Where(sd => sd.Standortwerk == this.Standort &&
-                                ( (Date == DateTime.MinValue) ||
-                               ((sd.SAPStoerungsbeginn != null && (sd.SAPStoerungsbeginn >= Date.AddHours(-8) && sd.SAPStoerungsbeginn <= Date.AddHours(8)  )) ||
-                                   (sd.SAPStoerungsbeginn == null && sd.ProperEreignisbeginn != null && (sd.ProperEreignisbeginn >= Date.AddHours(-8) && sd.ProperEreignisbeginn <= Date.AddHours(8))))
-                                   ))
-                        .ToList();
-            }
 
 
-            HashSet<string> added = new HashSet<string>();
-            int len = temp.Count;
-            for (int i = len - 1; i >= 0; i--)
-            {
-                if (!added.Contains(temp[i].KKS))
+                string body = "{\"data\": [\"" + this.Message + "\"]}";
+                var content = new StringContent(body);
+                content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+                var response = client.PostAsync("http://36efb52d-3352-412c-b2d5-a194108c8684.westeurope.azurecontainer.io/score", content).Result;
+
+                var responseString = response.Content.ReadAsStringAsync().Result;
+                string result = JsonConvert.DeserializeObject<string>(responseString);
+                Dictionary<string, double> mapResult = JsonConvert.DeserializeObject<Dictionary<string, double>>(result);
+
+                using (_SAPContext)
                 {
-                    if (mapResult.ContainsKey(temp[i].KKS) && mapResult[temp[i].KKS] >= 0.10)
+                    temp = (List<SAPData>)_SAPContext.SapData
+                            .Where(sd => sd.Standortwerk == this.Standort &&
+                                    ((Date == DateTime.MinValue) ||
+                                   ((sd.SAPStoerungsbeginn != null && (sd.SAPStoerungsbeginn >= Date.AddHours(-8) && sd.SAPStoerungsbeginn <= Date.AddHours(8))) ||
+                                       (sd.SAPStoerungsbeginn == null && sd.ProperEreignisbeginn != null && (sd.ProperEreignisbeginn >= Date.AddHours(-8) && sd.ProperEreignisbeginn <= Date.AddHours(8))))
+                                       ))
+                            .ToList();
+                }
+
+
+                HashSet<string> added = new HashSet<string>();
+                int len = temp.Count;
+                for (int i = len - 1; i >= 0; i--)
+                {
+                    if (!added.Contains(temp[i].KKS))
                     {
-                        temp[i].Propability = mapResult[temp[i].KKS] * 100;
-                        added.Add(temp[i].KKS);
+                        if (mapResult.ContainsKey(temp[i].KKS) && mapResult[temp[i].KKS] >= 0.10)
+                        {
+                            temp[i].Propability = mapResult[temp[i].KKS] * 100;
+                            added.Add(temp[i].KKS);
+                        }
+                        else
+                        {
+                            temp.RemoveAt(i);
+                        }
                     }
                     else
                     {
                         temp.RemoveAt(i);
                     }
                 }
-                else
-                {
-                    temp.RemoveAt(i);
-                }
+
+
+
+                SAPDataList.AddRange(temp.OrderByDescending(d => d.Propability));
             }
-
-           
-
-            SAPDataList.AddRange(temp.OrderByDescending(d => d.Propability));
-
+            catch ( Exception ex)
+            {
+                ViewData["error"] = ex.Message + Environment.NewLine + ex.ToString();
+            }
 
            
         }

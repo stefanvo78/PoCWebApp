@@ -34,6 +34,7 @@
 
 <div class="text-center">
     <form method="post">
+
         <table>
             <tr>
                 <td style="width:200px">Fehlermeldung:</td>
@@ -45,11 +46,11 @@
                         {
                             if ( ViewData["standort"] != null && ViewData["standort"].ToString() == standort)
                             {
-                                <option value="@standort" selected>@standort</option>
+                        <option value="@standort" selected>@standort</option>
                             }
                             else
                             {
-                                <option value="@standort">@standort</option>
+                        <option value="@standort">@standort</option>
                             }
                         }
                     </select>
@@ -64,7 +65,11 @@
                 <td style="width:200px"><input id="btnSearch" type="submit" value="Search" asp-page-handler="Search" /></td>
             </tr>
         </table>
+        <div>
+            @ViewData["error"]?.ToString()
 
+        </div>
+        
 
         <br />
         <table class="table">
@@ -93,26 +98,26 @@
             <tbody>
                 @foreach (var item in Model.SAPDataList)
                 {
-                    <tr>
-                        <td>
-                            <input id="Choose" type="checkbox" />
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.Standortwerk)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.KKS)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.KKSBezeichnung)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.Propability)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.Ereignisbeschreibung)
-                        </td>
-                    </tr>
+                <tr>
+                    <td>
+                        <input id="Choose" type="checkbox" />
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Standortwerk)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.KKS)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.KKSBezeichnung)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Propability)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Ereignisbeschreibung)
+                    </td>
+                </tr>
                 }
             </tbody>
         </table>
