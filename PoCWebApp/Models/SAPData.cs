@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
@@ -20,7 +21,9 @@ namespace PoCWebApp.Models
         [NotMapped]
         public double? Propability { get; set; }
 
+        [NotMapped]
+        [DefaultValue(false)]
+        public bool Checked { get; set; }
 
-        
     }
 }

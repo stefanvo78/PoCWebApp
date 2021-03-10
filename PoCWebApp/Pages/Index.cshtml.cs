@@ -18,7 +18,10 @@ using Microsoft.Extensions.Configuration;
 
 namespace PoCWebApp.Pages
 {
-
+    public class TableModel
+    {
+        public bool Chosen { get; set; }
+    }
     
     public class IndexModel : PageModel
     {
@@ -33,6 +36,13 @@ namespace PoCWebApp.Pages
         [BindProperty]
         public DateTime Date { get; set; }
 
+        [BindProperty]
+        public double? MinPropability { get; set; }
+
+        [BindProperty]
+        public List<TableModel> TableRows { get; set; }
+
+        [BindProperty]
         public List<SAPData> SAPDataList { get; set; }
 
         private IConfigurationRoot ConfigRoot;
@@ -40,15 +50,18 @@ namespace PoCWebApp.Pages
         private readonly SAPContext _SAPContext;
 
         private readonly ILogger<IndexModel> _logger;
-
+        
         public List<string> Standorte; 
 
         public IndexModel(ILogger<IndexModel> logger, SAPContext sapcontext, IConfiguration configRoot)
         {
+            
             ConfigRoot = (IConfigurationRoot)configRoot;
             _SAPContext = sapcontext;
             _logger = logger;
-            SAPDataList = new List<SAPData>();
+            
+            if ( SAPDataList == null)
+                SAPDataList = new List<SAPData>();
 
             Standorte = new List<string>();
             Standorte.Add("1005");
@@ -67,25 +80,33 @@ namespace PoCWebApp.Pages
             
         }
 
-        public void OnPost()
+        public void OnPostSave()
         {
-
+            
         }
         public async void OnPostSearch()
         {
+            
             ViewData["message"] = this.Message;
             ViewData["date"] = this.Date == DateTime.MinValue ? "" : this.Date.ToString();
             ViewData["standort"] = this.Standort;
-             
+            ViewData["minpropability"] = this.MinPropability;
+            
             List <SAPData> temp = new List<SAPData>();
 
             try
             {
 
 
-                string body = "{\"data\": [\"" + this.Message + "\"]}";
+                string body = "{\"data\": [\"" + this.Message  +"\"" + "," +  this.Standort +"]}";
                 var content = new StringContent(body);
                 content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+                if (!client.DefaultRequestHeaders.Contains("Authorization"))
+                {
+                    client.DefaultRequestHeaders.Add("Authorization", "Bearer " + ConfigRoot["Token"]);
+                }
+
                 var mlModelURL = ConfigRoot["MLModelURL"];
                 
                 var response = client.PostAsync(mlModelURL, content).Result;
@@ -112,7 +133,8 @@ namespace PoCWebApp.Pages
                 {
                     if (!added.Contains(temp[i].KKS))
                     {
-                        if (mapResult.ContainsKey(temp[i].KKS) && mapResult[temp[i].KKS] >= 0.10)
+                        if (mapResult.ContainsKey(temp[i].KKS) && 
+                            ( MinPropability == null || ( MinPropability != null && mapResult[temp[i].KKS] >= MinPropability / 100)))
                         {
                             temp[i].Propability = mapResult[temp[i].KKS] * 100;
                             added.Add(temp[i].KKS);
@@ -131,6 +153,7 @@ namespace PoCWebApp.Pages
 
 
                 SAPDataList.AddRange(temp.OrderByDescending(d => d.Propability));
+                
             }
             catch ( Exception ex)
             {

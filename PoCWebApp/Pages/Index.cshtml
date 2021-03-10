@@ -37,7 +37,7 @@
 
         <table>
             <tr>
-                <td style="width:200px">Fehlermeldung:</td>
+                <td style="width:200px">Ereignisbeschreibung:</td>
                 <td style="width:200px"><input name="Message" id="txtMessage" type="text" value="@ViewData["message"]?.ToString()" /></td>
                 <td style="width:200px">Standort:</td>
                 <td style="width:100px">
@@ -63,6 +63,11 @@
 
                 <td style="width:100px"></td>
                 <td style="width:200px"><input id="btnSearch" type="submit" value="Search" asp-page-handler="Search" /></td>
+                <!--<td style="width:200px"><input id="btnSave" type="submit" value="Save" asp-page-handler="Save" /></td>-->
+            </tr>
+            <tr>
+                <td style="width:200px">Min. Propability:</td>
+                <td style="width:200px"><input name="MinPropability" id="txtMinPropability" type="text" value="@ViewData["minpropability"]?.ToString()" /></td>
             </tr>
         </table>
         <div>
@@ -91,31 +96,33 @@
                         Propability
                     </th>
                     <th>
-                        Ereignisbeschreibung
+                        Meldungstext
                     </th>
                 </tr>
             </thead>
             <tbody>
-                @foreach (var item in Model.SAPDataList)
+                @for (var index =0; index< Model.SAPDataList.Count; index++)
                 {
+                    
                 <tr>
                     <td>
-                        <input id="Choose" type="checkbox" />
+                        <input type="checkbox" id="chosen" checked="@Model.SAPDataList[index].Checked"/>
+                        
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.Standortwerk)
+                        @Html.DisplayFor( modelItem => Model.SAPDataList[index].Standortwerk)
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.KKS)
+                        @Html.DisplayFor( modelItem => Model.SAPDataList[index].KKS)
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.KKSBezeichnung)
+                        @Html.DisplayFor( modelItem => Model.SAPDataList[index].KKSBezeichnung)
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.Propability)
+                        @Html.DisplayFor(modelItem =>Model.SAPDataList[index].Propability)
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.Ereignisbeschreibung)
+                        @Html.DisplayFor(modelItem => Model.SAPDataList[index].Ereignisbeschreibung)
                     </td>
                 </tr>
                 }
